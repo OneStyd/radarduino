@@ -1,3 +1,5 @@
+import binascii
+
 class SimonCipher(object):
     # Z's contant arrays
     z0 = [1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 1, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 1, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 1, 0]
@@ -23,8 +25,8 @@ class SimonCipher(object):
             self.word_size = self.block_size >> 1
         except KeyError:
             print()
-            print("    Ukuran blok tidak tersedia")
-            print("    Pilih salah satu ukuran blok dari daftar berikut:", [x for x in self.valid_setups.keys()])
+            print("  Ukuran blok tidak tersedia, pilih salah satu ukuran blok berikut:")
+            print(" ", [x for x in self.valid_setups.keys()])
             return
 
         try:
@@ -33,15 +35,15 @@ class SimonCipher(object):
             self.key_words = self.key_size // self.word_size
         except KeyError:
             print()
-            print("    Ukuran key tidak tersedia")
-            print("    Pilih salah satu ukuran key dari daftar berikut:", [x for x in self.block_validation.keys()])
+            print("  Ukuran key tidak tersedia, pilih salah satu ukuran key berikut:")
+            print(" ", [x for x in self.block_validation.keys()])
             return
 
         try:
             self.key = key & ((2 ** self.key_size) - 1)
         except (ValueError, TypeError):
             print()
-            print("     Key bermasalah, pastikan key berupa integer")
+            print("  Key bermasalah, pastikan key berupa integer")
             return
 
         # create properly sized bit mask
@@ -65,15 +67,14 @@ class SimonCipher(object):
 
         # print test vector 
         # print()
-        # print("    Test Vector")
-        # print("    -----------")
-        # print("    key         :", hex(self.key))
-        # print("    key_size    :", self.key_size)
-        # print("    block_size  :", self.block_size)
-        # print("    word_size   :", self.word_size)
-        # print("    key_words   :", self.key_words)
-        # print("    mask        :", hex(self.mod_mask))
-        # print()
+        # print("  Test Vector")
+        # print("  -----------")
+        # print("  key         :", hex(self.key))
+        # print("  key_size    :", self.key_size)
+        # print("  block_size  :", self.block_size)
+        # print("  word_size   :", self.word_size)
+        # print("  key_words   :", self.key_words)
+        # print("  mask        :", hex(self.mod_mask))
 
     # simon encrypt function
     def encrypt_function(self, upper_word, lower_word):
@@ -117,12 +118,11 @@ class SimonCipher(object):
             hex_block_size = self.block_size // 8
             padding_size = hex_block_size - (plaintext_length % hex_block_size)
         else:
-            print("    \"Plaintext bermasalah, pastikan plaintext berupa integer\"")
             return
 
         # add padding
         plaintext = int(hex(plaintext) + ('00' * (padding_size-1) + '0' + str(padding_size)), 0)
-        number_blocks = (len(hex(plaintext)) - 2) // hex_block_size // 2
+        number_blocks = round((len(hex(plaintext)) - 2) / hex_block_size / 2)
 
         # encrypt text per block
         ciphertext = 0
@@ -141,9 +141,8 @@ class SimonCipher(object):
         # variable initiation and validation
         if isinstance(ciphertext, int):
             hex_block_size = self.block_size // 8
-            number_blocks = (len(hex(ciphertext)) - 2) // hex_block_size // 2
+            number_blocks = round((len(hex(ciphertext)) - 2) / hex_block_size / 2)
         else:
-            print("    \"Ciphertext bermasalah, pastikan ciphertext berupa integer\"")
             return
         
         # decrypt text per block
@@ -173,8 +172,9 @@ if __name__ == "__main__":
     block_size = 64
     key_size = 128
     key = 0x030201000b0a0908131211101b1a1918
-    plaintext = 0x656b696c20646e75
-    ciphertext = 0x44c8fc20b9dfa07a61b2fcba7c619ead
+    data =  "128.0.0.1/-6.63255/106.76495".encode()
+    plaintext = int("0x" + binascii.hexlify(data).decode("utf-8"), 0)
+    ciphertext = 0x8CC2BDE43BB868D3DB954A9AF161316A3C0037022D2E139B474B544BC1A42B4F
 
     # run simon
     cipher = SimonCipher(block_size, key_size, key)
@@ -182,17 +182,35 @@ if __name__ == "__main__":
     # print result encryption
     try:
         result = cipher.encrypt(plaintext)
-        print("    Plaintext   :", hex(plaintext))
-        print("    Ciphertext  :", hex(result))
-        print()
+        if isinstance(result, int):
+            print()
+            print("  Result :")
+            print("  --------")
+            print(" ", hex(result))
+            print()
+        else:
+            print()
+            print("  Result :")
+            print("  --------")
+            print("  Plaintext bermasalah, pastikan plaintext berupa integer")
+            print()
     except (TypeError, AttributeError):
         print()
 
     # print result decryption
     # try:
     #     result = cipher.decrypt(ciphertext)
-    #     print("    Ciphertext  :", hex(ciphertext))
-    #     print("    Plaintext   :", hex(result))
-    #     print()
+    #     if isinstance(result, int):
+    #         print()
+    #         print("  Result :")
+    #         print("  --------")
+    #         print(" ", binascii.unhexlify(hex(result)[2:]).decode("utf-8"))
+    #         print()
+    #     else:
+    #         print()
+    #         print("  Result :")
+    #         print("  --------")
+    #         print("  Ciphertext bermasalah, pastikan ciphertext berupa integer")
+    #         print()
     # except (TypeError, AttributeError):
     #     print()

@@ -1,3 +1,5 @@
+import binascii
+
 class SpeckCipher(object):
     # valid cipher configurations
     # block_size: {key_size: number_rounds}
@@ -16,8 +18,8 @@ class SpeckCipher(object):
             self.word_size = self.block_size >> 1
         except KeyError:
             print()
-            print("    Ukuran blok tidak tersedia")
-            print("    Pilih salah satu ukuran blok dari daftar berikut:", [x for x in self.valid_setups.keys()])
+            print("  Ukuran blok tidak tersedia, pilih salah satu ukuran blok berikut:")
+            print(" ", [x for x in self.valid_setups.keys()])
             return
 
         try:
@@ -26,15 +28,15 @@ class SpeckCipher(object):
             self.key_words = self.key_size // self.word_size
         except KeyError:
             print()
-            print("    Ukuran key tidak tersedia")
-            print("    Pilih salah satu ukuran key dari daftar berikut:", [x for x in self.block_validation.keys()])
+            print("  Ukuran key tidak tersedia, pilih salah satu ukuran key berikut:")
+            print(" ", [x for x in self.block_validation.keys()])
             return
 
         try:
             self.key = key & ((2 ** self.key_size) - 1)
         except (ValueError, TypeError):
             print()
-            print("     Key bermasalah, pastikan key berupa integer")
+            print("  Key bermasalah, pastikan key berupa integer")
             return
 
         # create properly sized bit mask
@@ -66,17 +68,16 @@ class SpeckCipher(object):
 
         # print test vector 
         # print()
-        # print("    Test Vector")
-        # print("    -----------")
-        # print("    key         :", hex(self.key))
-        # print("    key_size    :", self.key_size)
-        # print("    block_size  :", self.block_size)
-        # print("    word_size   :", self.word_size)
-        # print("    key_words   :", self.key_words)
-        # print("    alpha_shift :", self.alpha_shift)
-        # print("    beta_shift  :", self.beta_shift)
-        # print("    mask        :", hex(self.mod_mask))
-        # print()
+        # print("  Test Vector")
+        # print("  -----------")
+        # print("  key         :", hex(self.key))
+        # print("  key_size    :", self.key_size)
+        # print("  block_size  :", self.block_size)
+        # print("  word_size   :", self.word_size)
+        # print("  key_words   :", self.key_words)
+        # print("  alpha_shift :", self.alpha_shift)
+        # print("  beta_shift  :", self.beta_shift)
+        # print("  mask        :", hex(self.mod_mask))
 
     # speck encrypt function
     def encrypt_function(self, upper_word, lower_word):    
@@ -115,12 +116,11 @@ class SpeckCipher(object):
             hex_block_size = self.block_size // 8
             padding_size = hex_block_size - (plaintext_length % hex_block_size)
         else:
-            print("    \"Plaintext bermasalah, pastikan plaintext berupa integer\"")
             return
 
         # add padding
         plaintext = int(hex(plaintext) + ('00' * (padding_size-1) + '0' + str(padding_size)), 0)
-        number_blocks = (len(hex(plaintext)) - 2) // hex_block_size // 2
+        number_blocks = round((len(hex(plaintext)) - 2) / hex_block_size / 2)
 
         # encrypt text per block
         ciphertext = 0
@@ -139,9 +139,8 @@ class SpeckCipher(object):
         # variable initiation and validation
         if isinstance(ciphertext, int):
             hex_block_size = self.block_size // 8
-            number_blocks = (len(hex(ciphertext)) - 2) // hex_block_size // 2
+            number_blocks = round((len(hex(ciphertext)) - 2) / hex_block_size / 2)
         else:
-            print("    \"Ciphertext bermasalah, pastikan ciphertext berupa integer\"")
             return
         
         # decrypt text per block
@@ -153,7 +152,7 @@ class SpeckCipher(object):
             a = text_block & self.mod_mask
             b, a = self.decrypt_function(b, a)
             plaintext = (plaintext << self.block_size) + ((b << self.word_size) + a)
-        
+
         # remove padding
         plaintext_length = len(hex(plaintext))
         padding_size = int(hex(plaintext)[-1:])
@@ -171,26 +170,45 @@ if __name__ == "__main__":
     block_size = 64
     key_size = 128
     key = 0x030201000b0a0908131211101b1a1918
-    plaintext = 0x3b7265747475432d
-    ciphertext = 0x8c6fa548454e028be25eaa8a1591541a
+    data =  "128.0.0.1/-6.63255/106.76495".encode()
+    plaintext = int("0x" + binascii.hexlify(data).decode("utf-8"), 0)
+    ciphertext = 0xcaea5158349ab4548657d5fd295100d972a1e3a2885ae518eaf2e20ee80b5f6
 
     # run speck
     cipher = SpeckCipher(block_size, key_size, key)
 
     # print result encryption
-    # try:
-    #     result = cipher.encrypt(plaintext)
-    #     print("    Plaintext   :", hex(plaintext))
-    #     print("    Ciphertext  :", hex(result))
-    #     print()
-    # except (TypeError, AttributeError):
-    #     print()
+    try:
+        result = cipher.encrypt(plaintext)
+        if isinstance(result, int):
+            print()
+            print("  Result :")
+            print("  --------")
+            print(" ", hex(result))
+            print()
+        else:
+            print()
+            print("  Result :")
+            print("  --------")
+            print("  Plaintext bermasalah, pastikan plaintext berupa integer")
+            print()
+    except (TypeError, AttributeError):
+        print()
 
     # print result decryption
     # try:
     #     result = cipher.decrypt(ciphertext)
-    #     print("    Ciphertext  :", hex(ciphertext))
-    #     print("    Plaintext   :", hex(result))
-    #     print()
+    #     if isinstance(result, int):
+    #         print()
+    #         print("  Result :")
+    #         print("  --------")
+    #         print(" ", binascii.unhexlify(hex(result)[2:]).decode("utf-8"))
+    #         print()
+    #     else:
+    #         print()
+    #         print("  Result :")
+    #         print("  --------")
+    #         print("  Ciphertext bermasalah, pastikan ciphertext berupa integer")
+    #         print()
     # except (TypeError, AttributeError):
     #     print()

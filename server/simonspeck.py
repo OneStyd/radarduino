@@ -1,3 +1,5 @@
+import binascii
+
 class SimonCipher(object):
     # Z's contant arrays
     z0 = [1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 1, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 1, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 1, 0]
@@ -23,8 +25,8 @@ class SimonCipher(object):
             self.word_size = self.block_size >> 1
         except KeyError:
             print()
-            print("    Ukuran blok tidak tersedia")
-            print("    Pilih salah satu ukuran blok dari daftar berikut:", [x for x in self.valid_setups.keys()])
+            print("  Ukuran blok tidak tersedia, pilih salah satu ukuran blok berikut:")
+            print(" ", [x for x in self.valid_setups.keys()])
             return
 
         try:
@@ -33,15 +35,15 @@ class SimonCipher(object):
             self.key_words = self.key_size // self.word_size
         except KeyError:
             print()
-            print("    Ukuran key tidak tersedia")
-            print("    Pilih salah satu ukuran key dari daftar berikut:", [x for x in self.block_validation.keys()])
+            print("  Ukuran key tidak tersedia, pilih salah satu ukuran key berikut:")
+            print(" ", [x for x in self.block_validation.keys()])
             return
 
         try:
             self.key = key & ((2 ** self.key_size) - 1)
         except (ValueError, TypeError):
             print()
-            print("     Key bermasalah, pastikan key berupa integer")
+            print("  Key bermasalah, pastikan key berupa integer")
             return
 
         # create properly sized bit mask
@@ -64,16 +66,15 @@ class SimonCipher(object):
             self.key_schedule.append(new_k & self.mod_mask)
 
         # print test vector 
-        print()
-        print("    Test Vector")
-        print("    -----------")
-        print("    key         :", hex(self.key))
-        print("    key_size    :", self.key_size)
-        print("    block_size  :", self.block_size)
-        print("    word_size   :", self.word_size)
-        print("    key_words   :", self.key_words)
-        print("    mask        :", hex(self.mod_mask))
-        print()
+        # print()
+        # print("  Test Vector")
+        # print("  -----------")
+        # print("  key         :", hex(self.key))
+        # print("  key_size    :", self.key_size)
+        # print("  block_size  :", self.block_size)
+        # print("  word_size   :", self.word_size)
+        # print("  key_words   :", self.key_words)
+        # print("  mask        :", hex(self.mod_mask))
 
     # simon encrypt function
     def encrypt_function(self, upper_word, lower_word):
@@ -117,12 +118,11 @@ class SimonCipher(object):
             hex_block_size = self.block_size // 8
             padding_size = hex_block_size - (plaintext_length % hex_block_size)
         else:
-            print("    \"Plaintext bermasalah, pastikan plaintext berupa integer\"")
             return
 
         # add padding
         plaintext = int(hex(plaintext) + ('00' * (padding_size-1) + '0' + str(padding_size)), 0)
-        number_blocks = (len(hex(plaintext)) - 2) // hex_block_size // 2
+        number_blocks = round((len(hex(plaintext)) - 2) / hex_block_size / 2)
 
         # encrypt text per block
         ciphertext = 0
@@ -141,9 +141,8 @@ class SimonCipher(object):
         # variable initiation and validation
         if isinstance(ciphertext, int):
             hex_block_size = self.block_size // 8
-            number_blocks = (len(hex(ciphertext)) - 2) // hex_block_size // 2
+            number_blocks = round((len(hex(ciphertext)) - 2) / hex_block_size / 2)
         else:
-            print("    \"Ciphertext bermasalah, pastikan ciphertext berupa integer\"")
             return
         
         # decrypt text per block
@@ -155,7 +154,7 @@ class SimonCipher(object):
             a = text_block & self.mod_mask
             b, a = self.decrypt_function(b, a)
             plaintext = (plaintext << self.block_size) + ((b << self.word_size) + a)
-        
+
         # remove padding
         plaintext_length = len(hex(plaintext))
         padding_size = int(hex(plaintext)[-1:])
@@ -186,8 +185,8 @@ class SpeckCipher(object):
             self.word_size = self.block_size >> 1
         except KeyError:
             print()
-            print("    Ukuran blok tidak tersedia")
-            print("    Pilih salah satu ukuran blok dari daftar berikut:", [x for x in self.valid_setups.keys()])
+            print("  Ukuran blok tidak tersedia, pilih salah satu ukuran blok berikut:")
+            print(" ", [x for x in self.valid_setups.keys()])
             return
 
         try:
@@ -196,15 +195,15 @@ class SpeckCipher(object):
             self.key_words = self.key_size // self.word_size
         except KeyError:
             print()
-            print("    Ukuran key tidak tersedia")
-            print("    Pilih salah satu ukuran key dari daftar berikut:", [x for x in self.block_validation.keys()])
+            print("  Ukuran key tidak tersedia, pilih salah satu ukuran key berikut:")
+            print(" ", [x for x in self.block_validation.keys()])
             return
 
         try:
             self.key = key & ((2 ** self.key_size) - 1)
         except (ValueError, TypeError):
             print()
-            print("     Key bermasalah, pastikan key berupa integer")
+            print("  Key bermasalah, pastikan key berupa integer")
             return
 
         # create properly sized bit mask
@@ -235,18 +234,17 @@ class SpeckCipher(object):
             self.key_schedule.append(rotl_b ^ new_l)
 
         # print test vector 
-        print()
-        print("    Test Vector")
-        print("    -----------")
-        print("    key         :", hex(self.key))
-        print("    key_size    :", self.key_size)
-        print("    block_size  :", self.block_size)
-        print("    word_size   :", self.word_size)
-        print("    key_words   :", self.key_words)
-        print("    alpha_shift :", self.alpha_shift)
-        print("    beta_shift  :", self.beta_shift)
-        print("    mask        :", hex(self.mod_mask))
-        print()
+        # print()
+        # print("  Test Vector")
+        # print("  -----------")
+        # print("  key         :", hex(self.key))
+        # print("  key_size    :", self.key_size)
+        # print("  block_size  :", self.block_size)
+        # print("  word_size   :", self.word_size)
+        # print("  key_words   :", self.key_words)
+        # print("  alpha_shift :", self.alpha_shift)
+        # print("  beta_shift  :", self.beta_shift)
+        # print("  mask        :", hex(self.mod_mask))
 
     # speck encrypt function
     def encrypt_function(self, upper_word, lower_word):    
@@ -285,12 +283,11 @@ class SpeckCipher(object):
             hex_block_size = self.block_size // 8
             padding_size = hex_block_size - (plaintext_length % hex_block_size)
         else:
-            print("    \"Plaintext bermasalah, pastikan plaintext berupa integer\"")
             return
 
         # add padding
         plaintext = int(hex(plaintext) + ('00' * (padding_size-1) + '0' + str(padding_size)), 0)
-        number_blocks = (len(hex(plaintext)) - 2) // hex_block_size // 2
+        number_blocks = round((len(hex(plaintext)) - 2) / hex_block_size / 2)
 
         # encrypt text per block
         ciphertext = 0
@@ -309,9 +306,8 @@ class SpeckCipher(object):
         # variable initiation and validation
         if isinstance(ciphertext, int):
             hex_block_size = self.block_size // 8
-            number_blocks = (len(hex(ciphertext)) - 2) // hex_block_size // 2
+            number_blocks = round((len(hex(ciphertext)) - 2) / hex_block_size / 2)
         else:
-            print("    \"Ciphertext bermasalah, pastikan ciphertext berupa integer\"")
             return
         
         # decrypt text per block
@@ -323,7 +319,7 @@ class SpeckCipher(object):
             a = text_block & self.mod_mask
             b, a = self.decrypt_function(b, a)
             plaintext = (plaintext << self.block_size) + ((b << self.word_size) + a)
-        
+
         # remove padding
         plaintext_length = len(hex(plaintext))
         padding_size = int(hex(plaintext)[-1:])
@@ -339,77 +335,78 @@ class SpeckCipher(object):
 if __name__ == "__main__":
     # manual setup
     print()
-    print("    Welcome to Simon & Speck Cipher for Python")
-    print("    ------------------------------------------")
+    print("  Welcome to Simon & Speck Cipher for Python")
+    print("  ------------------------------------------")
     print()
-    print("    Please choose cipher algorithm you need:")
-    print("    1. SIMON ENCRYPTION")
-    print("    2. SIMON DECRYPTION")
-    print("    3. SPECK ENCRYPTION")
-    print("    4. SPECK DECRYPTION")
+    print("  Please choose cipher algorithm you need:")
+    print("  1. SIMON ENCRYPTION")
+    print("  2. SIMON DECRYPTION")
+    print("  3. SPECK ENCRYPTION")
+    print("  4. SPECK DECRYPTION")
     print()
-    algorithm = int(input("    your choice number: "))
+    algorithm = int(input("  your choice number: "))
     print()
 
     if algorithm < 1 or algorithm > 4:
         print("Sorry, there is only 4 choices")
         print()
 
-    print("    Please input your block size:")
-    block_size = int(input("    "))
+    print("  Please input your block size:")
+    block_size = int(input("  "))
     print()
 
-    print("    Please input your key size:")
-    key_size = int(input("    "))
+    print("  Please input your key size:")
+    key_size = int(input("  "))
     print()
 
-    print("    Please input your key in hexadecimal:")
-    key = input("    0x")
+    print("  Please input your key in hexadecimal:")
+    key = input("  0x")
     key = int("0x" + key, 0)
+    print()
 
     if algorithm == 1:
         cipher = SimonCipher(block_size, key_size, key)
-        print("    Please input plaintext you want to encrypt in hexadecimal:")
-        plaintext = input("    0x")
+        print("  Please input plaintext you want to encrypt in hexadecimal:")
+        plaintext = input("  0x")
         plaintext = int("0x" + plaintext, 0)
         result = cipher.encrypt(plaintext)
         print()
-        print("    Result:")
-        print("    -------")
-        print("   ", hex(result))
+        print("  Result:")
+        print("  -------")
+        print(" ", hex(result))
         print()
     elif algorithm == 2:
         cipher = SimonCipher(block_size, key_size, key)
-        print("    Please input ciphertext you want to decrypt in hexadecimal:")
-        ciphertext = input("    0x")
+        print("  Please input ciphertext you want to decrypt in hexadecimal:")
+        ciphertext = input("  0x")
         ciphertext = int("0x" + ciphertext, 0)
         result = cipher.decrypt(ciphertext)
         print()
-        print("    Result:")
-        print("    -------")
-        print("   ", hex(result))
+        print("  Result:")
+        print("  -------")
+        print(" ", hex(result))
         print()
     elif algorithm == 3:
         cipher = SpeckCipher(block_size, key_size, key)
-        print("    Please input plaintext you want to encrypt in hexadecimal:")
-        plaintext = input("    0x")
+        print("  Please input plaintext you want to encrypt in hexadecimal:")
+        plaintext = input("  0x")
         plaintext = int("0x" + plaintext, 0)
         result = cipher.encrypt(plaintext)
         print()
-        print("    Result:")
-        print("    -------")
-        print("   ", hex(result))
+        print("  Result:")
+        print("  -------")
+        print(" ", hex(result))
         print()
     elif algorithm == 4:
         cipher = SpeckCipher(block_size, key_size, key)
-        print("    Please input ciphertext you want to decrypt in hexadecimal:")
-        ciphertext = input("    0x")
+        print("  Please input ciphertext you want to decrypt in hexadecimal:")
+        ciphertext = input("  0x")
         ciphertext = int("0x" + ciphertext, 0)
         result = cipher.decrypt(ciphertext)
         print()
-        print("    Result:")
-        print("    -------")
-        print("   ", hex(result))
+        print("  Result:")
+        print("  -------")
+        print(" ", hex(result))
         print()
     else:
         print("Sorry, there is something wrong")
