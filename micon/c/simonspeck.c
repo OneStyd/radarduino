@@ -248,7 +248,8 @@ int main()
 {
     u32 PL, PR, CL, CR;
     u32 key[4] = { 0 };
-    char plaintext[] = "test aja dulu, hasilnya belakangan", value[1024] = {0};
+    key[3]=0x1b1a1918; key[2]=0x13121110; key[1]=0x0b0a0908; key[0]=0x03020100;
+    char plaintext[] = "128.0.0.1/-6.6325536/106.7649500", value[1024] = {0};
     unsigned int arrayHex[256] = {0}, temp=0;
     int i=0, j=0, k=0;
     char a, b, c, d;
@@ -280,11 +281,8 @@ int main()
         printf("  Blok ke-%d = %08X\n", i+1, arrayHex[i]);
         i++;
     }
-    printf("\n");
+    printf("\n  Simon Encryption Result\n");
 
-    key[3]=0x1b1a1918; key[2]=0x13121110; key[1]=0x0b0a0908; key[0]=0x03020100;
-
-		printf("  Simon Encryption Result\n");
     i=0;
     while (arrayHex[i]!=0) {
         SimonEncrypt(arrayHex[i], arrayHex[i+1], key, 64, 128);
@@ -318,11 +316,11 @@ int main()
 			Ciphertext: 8c6fa548 454e028b
 		  ---------------------------------------------------------------------  */
 
-		// key[3]=0x1b1a1918; key[2]=0x13121110; key[1]=0x0b0a0908; key[0]=0x03020100;
+//		 key[3]=0x1b1a1918; key[2]=0x13121110; key[1]=0x0b0a0908; key[0]=0x03020100;
 
-		// // Enkripsi
-		// PL=0x3b726574; PR=0x7475432d;
-		// SpeckEncrypt(PL, PR, key, 64, 128);
+		 // Enkripsi
+//		 PL=0x3b726574; PR=0x7475432d;
+//		 SpeckEncrypt(PL, PR, key, 64, 128);
 
 		// // Dekripsi
 		// CL=0x8c6fa548; CR=0x454e028b;

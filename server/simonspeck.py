@@ -141,7 +141,7 @@ class SimonCipher(object):
         # variable initiation and validation
         if isinstance(ciphertext, int):
             hex_block_size = self.block_size // 8
-            number_blocks = round((len(hex(ciphertext)) - 2) / hex_block_size / 2)
+            number_blocks = -(-(len(hex(ciphertext)) - 2) // hex_block_size) // 2
         else:
             return
         
@@ -306,7 +306,7 @@ class SpeckCipher(object):
         # variable initiation and validation
         if isinstance(ciphertext, int):
             hex_block_size = self.block_size // 8
-            number_blocks = round((len(hex(ciphertext)) - 2) / hex_block_size / 2)
+            number_blocks = -(-(len(hex(ciphertext)) - 2) // hex_block_size) // 2
         else:
             return
         

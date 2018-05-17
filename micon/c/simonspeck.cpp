@@ -180,7 +180,6 @@ void SpeckEncrypt(u32 PL, u32 PR, u32* key, int blocksize, int keysize)
 	{
 		l[i+mm-1] = (k[i] + ROTL(-a, l[i])) ^ i;
 		k[i+1] = ROTL(b, k[i]) ^ l[i+mm-1];
-		printf(" %d\t%d\n", l[i], k[i]);
 	}
 
 	// ------------------------- encryption ----------------------------
@@ -249,6 +248,7 @@ int main()
 {
     u32 PL, PR, CL, CR;
     u32 key[4] = { 0 };
+    key[3]=0x1b1a1918; key[2]=0x13121110; key[1]=0x0b0a0908; key[0]=0x03020100;
 
     /* 	------------------------- Simon Test Vector -------------------------
 		Ukuran Blok: 64
@@ -257,8 +257,6 @@ int main()
 		Plaintext: 656b696c 20646e75
 		Ciphertext: 44c8fc20 b9dfa07a
 	   	---------------------------------------------------------------------  */
-
-    key[3]=0x1b1a1918; key[2]=0x13121110; key[1]=0x0b0a0908; key[0]=0x03020100;
 
 	// Enkripsi
 //	PL=0x656b696c; PR=0x20646e75;
@@ -276,14 +274,12 @@ int main()
 		Ciphertext: 8c6fa548 454e028b
 	   	---------------------------------------------------------------------  */
 
-//	key[3]=0x1b1a1918; key[2]=0x13121110; key[1]=0x0b0a0908; key[0]=0x03020100;
-
 	// Enkripsi
-	PL=0x3b726574; PR=0x7475432d;
-	SpeckEncrypt(PL, PR, key, 64, 128);
+//	PL=0x3b726574; PR=0x7475432d;
+//	SpeckEncrypt(PL, PR, key, 64, 128);
 
 	// Dekripsi
-//	CL=0x8c6fa548; CR=0x454e028b;
-//	SpeckDecrypt(CL, CR, key, 64, 128);
+	CL=0x8c6fa548; CR=0x454e028b;
+	SpeckDecrypt(CL, CR, key, 64, 128);
 }
 
